@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 
 class Product(models.Model):
@@ -11,7 +13,7 @@ class Product(models.Model):
 		return f'Product<pk={self.pk}, name={self.name}>'
 
 	class Meta:
-		verbose_name = 'продукт'
+		verbose_name = 'продукция'
 
 
 class StockRoom(models.Model):
@@ -21,12 +23,6 @@ class StockRoom(models.Model):
 	)
 	limit = models.PositiveIntegerField(
 		verbose_name='общий лимит',
-	)
-	products = models.ManyToManyField(
-		verbose_name='продукт',
-		to=Product,
-		through='StockRoomBasket',
-		related_name='stock_rooms'
 	)
 
 	def __str__(self):
@@ -41,11 +37,9 @@ class Client(models.Model):
 		verbose_name='имя',
 		max_length=255
 	)
-	products = models.ManyToManyField(
-		verbose_name='продукты',
-		to=Product,
-		through='ClientProduct',
-		related_name='clients'
+	product_batches = GenericRelation(
+		verbose_name='партия продукции',
+		to='ProductBatch'
 	)
 
 	def __str__(self):
@@ -63,7 +57,7 @@ class StockRoomBasket(models.Model):
 		related_name='stock_room_baskets'
 	)
 	product = models.ForeignKey(
-		verbose_name='продукт',
+		verbose_name='продукция',
 		to=Product,
 		on_delete=models.CASCADE,
 		related_name='stock_room_baskets'
@@ -77,11 +71,9 @@ class StockRoomBasket(models.Model):
 		max_digits=10,
 		decimal_places=1
 	)
-	clients = models.ManyToManyField(
-		verbose_name='клиенты',
-		to=Client,
-		through='StockRoomBasketPosition',
-		related_name='stock_room_baskets'
+	product_batches = GenericRelation(
+		verbose_name='партия продукции',
+		to='ProductBatch'
 	)
 
 	def __str__(self):
@@ -91,54 +83,38 @@ class StockRoomBasket(models.Model):
 		verbose_name = 'позиция на складе'
 
 
-class StockRoomBasketPosition(models.Model):
-	stock_room_basket = models.ForeignKey(
-		verbose_name='позиция на складе',
-		to=StockRoomBasket,
-		on_delete=models.CASCADE,
-		related_name='stock_room_basket_position'
-	)
-	client = models.ForeignKey(
-		verbose_name='владелец',
-		to=Client,
-		on_delete=models.SET_NULL,
-		null=True,
-		blank=True,
-		related_name='stock_room_basket_position'
-	)
-	amount = models.PositiveIntegerField(
-		verbose_name='количество'
-	)
-
-	def __str__(self):
-		return f'StockRoomBasketPosition<pk={self.pk}, stock_room_basket={self.stock_room_basket}, amount={self.amount}>'
-
-	class Meta:
-		verbose_name = 'продукт на складе'
-
-
-class ClientProduct(models.Model):
-	client = models.ForeignKey(
-		verbose_name='владелец',
-		to=Client,
-		on_delete=models.CASCADE,
-		related_name='client_products'
-	)
+class ProductBatch(models.Model):
 	product = models.ForeignKey(
-		verbose_name='продукт',
+		verbose_name='продукция',
 		to=Product,
-		on_delete=models.CASCADE,
-		related_name='client_products'
+		on_delete=models.CASCADE
 	)
 	amount = models.PositiveIntegerField(
 		verbose_name='количество'
 	)
+	content_type_own = models.ForeignKey(
+		to=ContentType,
+		on_delete=models.CASCADE
+	)
+	object_id_own = models.PositiveIntegerField()
+	own = GenericForeignKey(
+		ct_field='content_type_own',
+		fk_field='object_id_own'
+	)
+	content_type_holder = models.ForeignKey(
+		to=ContentType,
+		on_delete=models.CASCADE
+	)
+	object_id_holder = models.PositiveIntegerField()
+	holder = GenericForeignKey(
+		ct_field='content_type_holder',
+		fk_field='object_id_holder'
+	)
 
 	def __str__(self):
-		return f'ClientProduct<pk={self.pk}, client={self.client}, product={self.product}, amount={self.amount}>'
-
-	class Meta:
-		verbose_name = 'продукт клиента'
+		return f'ProductBatch<pk={self.pk}, product={self.product}, ' \
+			f'own={self.content_type_own}-{self.object_id_own}, ' \
+			f'holder={self.content_type_holder}-{self.object_id_holder}, amount={self.amount}>'
 
 
 class Road(models.Model):
