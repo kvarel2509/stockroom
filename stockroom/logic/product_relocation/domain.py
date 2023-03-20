@@ -1,5 +1,7 @@
 from typing import Iterable
 
+from django.db import transaction
+
 
 class MoveRequest:
 	"""Сущность - запрос на перемещение продукции"""
@@ -18,7 +20,10 @@ class CheckRelocateBehavior:
 
 
 class CheckListRelocate(CheckRelocateBehavior):
-	"""Расширение для CheckRelocateBehavior - искапсуляция перечня проверок на возможность выполнения перемещения продукции"""
+	"""
+	Расширение для CheckRelocateBehavior - искапсуляция перечня проверок на возможность
+	выполнения перемещения продукции
+	"""
 
 	def __init__(self, check_list_relocate_behavior: Iterable[CheckRelocateBehavior]) -> None:
 		self.check_list_relocate_behavior = check_list_relocate_behavior
@@ -61,3 +66,12 @@ class RelocateManager:
 		with transaction.atomic():
 			self.give_away_stage.relocate(self.move_request)
 			self.take_stage.relocate(self.move_request)
+
+
+class RelocateManagerFactory:
+	"""
+	Фабрика, предоставляющая менеджер, отвечающий за перемещение продукции
+	"""
+	def get_relocate_manager(self, move_request: MoveRequest) -> RelocateManager:
+		pass
+

@@ -37,9 +37,19 @@ class Client(models.Model):
 		verbose_name='имя',
 		max_length=255
 	)
-	product_batches = GenericRelation(
+	own_product_batches = GenericRelation(
 		verbose_name='партия продукции',
-		to='ProductBatch'
+		to='ProductBatch',
+		content_type_field='content_type_own',
+		object_id_field='object_id_own',
+		related_query_name='own_object',
+	)
+	holder_product_batches = GenericRelation(
+		verbose_name='партия продукции',
+		to='ProductBatch',
+		content_type_field='content_type_holder',
+		object_id_field='object_id_holder',
+		related_query_name='holder_object'
 	)
 
 	def __str__(self):
@@ -71,9 +81,19 @@ class StockRoomBasket(models.Model):
 		max_digits=10,
 		decimal_places=1
 	)
-	product_batches = GenericRelation(
+	own_product_batches = GenericRelation(
 		verbose_name='партия продукции',
-		to='ProductBatch'
+		to='ProductBatch',
+		content_type_field='content_type_own',
+		object_id_field='object_id_own',
+		related_query_name='own_object'
+	)
+	holder_product_batches = GenericRelation(
+		verbose_name='партия продукции',
+		to='ProductBatch',
+		content_type_field='content_type_holder',
+		object_id_field='object_id_own',
+		related_query_name='holder_object'
 	)
 
 	def __str__(self):
@@ -94,7 +114,8 @@ class ProductBatch(models.Model):
 	)
 	content_type_own = models.ForeignKey(
 		to=ContentType,
-		on_delete=models.CASCADE
+		on_delete=models.CASCADE,
+		related_name='+'
 	)
 	object_id_own = models.PositiveIntegerField()
 	own = GenericForeignKey(
@@ -103,7 +124,8 @@ class ProductBatch(models.Model):
 	)
 	content_type_holder = models.ForeignKey(
 		to=ContentType,
-		on_delete=models.CASCADE
+		on_delete=models.CASCADE,
+		related_name='+'
 	)
 	object_id_holder = models.PositiveIntegerField()
 	holder = GenericForeignKey(

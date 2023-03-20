@@ -22,7 +22,9 @@ class GiveAwayRelocateBehavior(RelocateBehavior):
 
 class TakesRelocateBehavior(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
-		product_batch = move_request.to_entity.product_batches.filter(own=move_request.product_batch.own, product=move_request.product_batch.product)
+		product_batch = move_request.to_entity.product_batches.filter(
+			own_obj=move_request.product_batch.own, product=move_request.product_batch.product
+		)
 		if product_batch:
 			product_batch.amount += move_request.amount
 			product_batch.save()
