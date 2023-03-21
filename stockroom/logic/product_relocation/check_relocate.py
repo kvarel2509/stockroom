@@ -1,6 +1,6 @@
 from stockroom.logic.product_relocation.domain import CheckRelocateBehavior, MoveRequest
-from stockroom.logic.product_relocation.exceptions import IsNotHolder, NotEnoughProduct, LimitIsExceeded
-from stockroom.models import ProductBatch
+from stockroom.logic.product_relocation.exceptions import IsNotHolder, NotEnoughProduct, LimitIsExceeded, \
+	BasketDoesNotSupportThisProduct
 
 
 class CheckProductBatchHolderIsFromEntity(CheckRelocateBehavior):
@@ -15,21 +15,19 @@ class CheckEnoughProductToRelocate(CheckRelocateBehavior):
 			raise NotEnoughProduct()
 
 
+class CheckStockRoomBasketSupportsProduct(CheckRelocateBehavior):
+	def check_relocate(self, move_request: MoveRequest) -> None:
+		if move_request.product_batch.product is not move_request.to_entity.product:
+			raise BasketDoesNotSupportThisProduct()
+
+
 class CheckFitInStockRoomBasketLimit(CheckRelocateBehavior):
 	def check_relocate(self, move_request: MoveRequest) -> None:
-		current_occupancy = sum(
-			move_request.to_entity.holder_product_batches.values_list('amount', flat=True)
-		)
-		if move_request.amount + current_occupancy > move_request.to_entity.limit:
+		if move_request.amount + move_request.to_entity.employed_limit > move_request.to_entity.limit:
 			raise LimitIsExceeded()
 
 
 class CheckFitInStockRoomLimit(CheckRelocateBehavior):
 	def check_relocate(self, move_request: MoveRequest) -> None:
-		current_occupancy = sum(
-			ProductBatch.objects.filter(
-				own_object__stock_room=move_request.to_entity.stock_room
-			).values_list('amount', flat=True)
-		)
-		if move_request.amount + current_occupancy > move_request.to_entity.stock_room.limit:
+		if move_request.amount + move_request.to_entity.stock_room.employed_limit > move_request.to_entity.stock_room.limit:
 			raise LimitIsExceeded()

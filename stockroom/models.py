@@ -24,6 +24,10 @@ class StockRoom(models.Model):
 	limit = models.PositiveIntegerField(
 		verbose_name='общий лимит',
 	)
+	employed_limit = models.IntegerField(
+		verbose_name='используемый лимит',
+		default=0
+	)
 
 	def __str__(self):
 		return f'StockRoom<pk={self.pk}, name={self.name}, limit={self.limit}>'
@@ -42,14 +46,12 @@ class Client(models.Model):
 		to='ProductBatch',
 		content_type_field='content_type_own',
 		object_id_field='object_id_own',
-		related_query_name='own_object',
 	)
 	holder_product_batches = GenericRelation(
 		verbose_name='партия продукции',
 		to='ProductBatch',
 		content_type_field='content_type_holder',
 		object_id_field='object_id_holder',
-		related_query_name='holder_object'
 	)
 
 	def __str__(self):
@@ -75,6 +77,10 @@ class StockRoomBasket(models.Model):
 	limit = models.PositiveIntegerField(
 		verbose_name='лимит',
 	)
+	employed_limit = models.IntegerField(
+		verbose_name='используемый лимит',
+		default=0
+	)
 	tariff = models.DecimalField(
 		verbose_name='тариф',
 		help_text='за единицу продукта',
@@ -82,14 +88,14 @@ class StockRoomBasket(models.Model):
 		decimal_places=1
 	)
 	own_product_batches = GenericRelation(
-		verbose_name='партия продукции',
+		verbose_name='партии продукции',
 		to='ProductBatch',
 		content_type_field='content_type_own',
 		object_id_field='object_id_own',
 		related_query_name='own_object'
 	)
 	holder_product_batches = GenericRelation(
-		verbose_name='партия продукции',
+		verbose_name='партии продукции',
 		to='ProductBatch',
 		content_type_field='content_type_holder',
 		object_id_field='object_id_own',

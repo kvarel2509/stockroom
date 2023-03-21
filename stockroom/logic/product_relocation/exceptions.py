@@ -8,3 +8,7 @@ class IsNotHolder(Exception):
 
 class LimitIsExceeded(Exception):
 	pass
+
+
+class BasketDoesNotSupportThisProduct(Exception):
+	pass
