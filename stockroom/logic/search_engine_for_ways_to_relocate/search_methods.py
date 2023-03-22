@@ -11,6 +11,7 @@ from stockroom.models import StockRoomBasket, Road
 
 
 class ShortWayClientToStockRoomSearchMethod(SearchMethod):
+	"""Реализация алгоритма поиска наикратчайших путей размещения продукции на склад"""
 	def search(self, search_request: SearchRequest) -> Generator:
 		distance = Road.objects.filter(
 			client=search_request.product_batch.holder,
@@ -64,6 +65,7 @@ class ShortWayClientToStockRoomSearchMethod(SearchMethod):
 
 
 class CheapWayClientToStockRoomSearchMethod(SearchMethod):
+	"""Реализация алгоритма поиска самого дешевого пути размещения продукции на склад"""
 	def search(self, search_request: SearchRequest) -> Generator:
 		distance = Road.objects.filter(
 			client=search_request.product_batch.holder,

@@ -5,13 +5,14 @@ from stockroom.logic.search_engine_for_ways_to_relocate.search_methods import Ch
 
 
 class BaseSearchEngineFactory(SearchEngineFactory):
+	"""Реализация фабрики, представляющей контекст для поиска путей размещения"""
 	def get_search_engine(self) -> SearchEngine:
-		if self.method_alias == SearchWayRelocationAlias.CHEAP_WAY.value:
+		if self.search_request.method_alias == SearchWayRelocationAlias.CHEAP_WAY.value:
 			return SearchEngine(
 				search_request=self.search_request,
 				search_method=CheapWayClientToStockRoomSearchMethod()
 			)
-		elif self.method_alias == SearchWayRelocationAlias.SHORT_WAY.value:
+		elif self.search_request.method_alias == SearchWayRelocationAlias.SHORT_WAY.value:
 			return SearchEngine(
 				search_request=self.search_request,
 				search_method=ShortWayClientToStockRoomSearchMethod()

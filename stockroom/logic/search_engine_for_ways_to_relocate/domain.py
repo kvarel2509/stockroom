@@ -5,12 +5,15 @@ from stockroom.models import ProductBatch
 
 
 class SearchRequest:
-	def __init__(self, product_batch: ProductBatch, amount: int) -> None:
+	"""Сущность - запрос на поиск путей размещения"""
+	def __init__(self, product_batch: ProductBatch, amount: int, method_alias: str) -> None:
 		self.product_batch = product_batch
 		self.amount = amount
+		self.method_alias = method_alias
 
 
 class SearchResponse:
+	"""Сущность - результат поиска пути размещения"""
 	def __init__(self, move_requests: Set[MoveRequest], coat: float) -> None:
 		self.move_requests = move_requests
 		self.coat = coat
@@ -26,10 +29,12 @@ class SearchResponse:
 
 
 class SearchMethod:
+	"""Базовый класс - Алгоритм поиска пути размещения"""
 	def search(self, search_request: SearchRequest) -> Generator: ...
 
 
 class SearchEngine:
+	"""Контекст поиска путей размещения."""
 	def __init__(self, search_request: SearchRequest, search_method: SearchMethod) -> None:
 		self.search_request = search_request
 		self.search_method = search_method
@@ -39,8 +44,8 @@ class SearchEngine:
 
 
 class SearchEngineFactory:
-	def __init__(self, search_request: SearchRequest, method_alias: str) -> None:
+	"""Фабрика, порождающая контекст поиска путей размещения - экземпляр SearchEngine"""
+	def __init__(self, search_request: SearchRequest) -> None:
 		self.search_request = search_request
-		self.method_alias = method_alias
 
 	def get_search_engine(self) -> SearchEngine: ...
