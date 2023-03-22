@@ -1,8 +1,8 @@
-class NotEnoughProduct(Exception):
+class TargetIsHolder(Exception):
 	pass
 
 
-class IsNotHolder(Exception):
+class NotEnoughProduct(Exception):
 	pass
 
 

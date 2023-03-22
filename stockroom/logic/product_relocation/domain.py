@@ -5,11 +5,16 @@ from django.db import transaction
 
 class MoveRequest:
 	"""Сущность - запрос на перемещение продукции"""
-	def __init__(self, from_entity, to_entity, product_batch, amount) -> None:
-		self.from_entity = from_entity
-		self.to_entity = to_entity
+	def __init__(self, target, product_batch, amount) -> None:
+		self.target = target
 		self.product_batch = product_batch
 		self.amount = amount
+
+	def __eq__(self, other):
+		return self.target is other.target and self.product_batch is other.product_batch and self.amount == other.amount
+
+	def __hash__(self):
+		return hash((self.target, self.product_batch, self.amount))
 
 
 class CheckRelocateBehavior:
@@ -72,7 +77,7 @@ class RelocateManager:
 			self.take_stage.relocate(self.move_request)
 
 
-class RelocateManagerBuilder:
+class RelocateManagerFactory:
 	"""Фабрика, предоставляющая менеджер, отвечающий за перемещение продукции"""
 	def __init__(self, move_request: MoveRequest) -> None:
 		self.move_request = move_request

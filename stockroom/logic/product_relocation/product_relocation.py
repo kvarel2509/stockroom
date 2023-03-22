@@ -25,36 +25,36 @@ class ProductBatchTakes(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
 		own_type = ContentType.objects.get_for_model(move_request.product_batch.own.__class__)
 		own_id = move_request.product_batch.own.id
-		product_batch = move_request.to_entity.holder_product_batches.filter(
+		product_batch = move_request.target.holder_product_batches.filter(
 			content_type_own=own_type, object_id_own=own_id, product=move_request.product_batch.product
 		).first()
 		if product_batch:
 			product_batch.amount += move_request.amount
 			product_batch.save()
 		else:
-			move_request.product_batch.holder = move_request.to_entity
+			move_request.product_batch.holder = move_request.target
 			move_request.product_batch.save()
 
 
 class ChangeStockRoomBasketLimitGiveAway(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
-		move_request.from_entity.employed_limit -= move_request.amount
-		move_request.from_entity.save()
+		move_request.product_batch.holder.employed_limit -= move_request.amount
+		move_request.product_batch.holder.save()
 
 
 class ChangeStockRoomLimitGiveAway(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
-		move_request.from_entity.stock_room.employed_limit -= move_request.amount
-		move_request.from_entity.stock_room.save()
+		move_request.product_batch.holder.stock_room.employed_limit -= move_request.amount
+		move_request.product_batch.holder.stock_room.save()
 
 
 class ChangeStockRoomBasketLimitTakes(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
-		move_request.to_entity.employed_limit += move_request.amount
-		move_request.to_entity.save()
+		move_request.target.employed_limit += move_request.amount
+		move_request.target.save()
 
 
 class ChangeStockRoomLimitTakes(RelocateBehavior):
 	def relocate(self, move_request: MoveRequest) -> None:
-		move_request.to_entity.stock_room.employed_limit -= move_request.amount
-		move_request.from_entity.stock_room.save()
+		move_request.target.stock_room.employed_limit -= move_request.amount
+		move_request.product_batch.holder.stock_room.save()

@@ -1,7 +1,6 @@
-from stockroom.logic.product_relocation.check_relocate import CheckProductBatchHolderIsFromEntity, \
-	CheckEnoughProductToRelocate, CheckStockRoomBasketSupportsProduct, CheckFitInStockRoomBasketLimit, \
-	CheckFitInStockRoomLimit
-from stockroom.logic.product_relocation.domain import RelocateManagerBuilder, RelocateManager, \
+from stockroom.logic.product_relocation.check_relocate import CheckEnoughProductToRelocate, \
+	CheckStockRoomBasketSupportsProduct, CheckFitInStockRoomBasketLimit, CheckFitInStockRoomLimit, CheckTargetIsHolder
+from stockroom.logic.product_relocation.domain import RelocateManagerFactory, RelocateManager, \
 	RelocateStage, CheckListRelocateBehavior, RelocateListActionBehavior, CheckRelocateBehavior
 from stockroom.logic.product_relocation.product_relocation import ChangeProductBatchGiveAway, \
 	ChangeStockRoomBasketLimitGiveAway, ChangeStockRoomLimitGiveAway, ProductBatchTakes, \
@@ -9,7 +8,7 @@ from stockroom.logic.product_relocation.product_relocation import ChangeProductB
 from stockroom.models import Client, StockRoomBasket
 
 
-class BaseRelocateManagerBuilder(RelocateManagerBuilder):
+class BaseRelocateManagerFactory(RelocateManagerFactory):
 	def get_relocate_manager(self) -> RelocateManager:
 		return RelocateManager(
 			move_request=self.move_request,
@@ -18,21 +17,21 @@ class BaseRelocateManagerBuilder(RelocateManagerBuilder):
 		)
 
 	def _get_give_away_stage(self) -> RelocateStage:
-		if isinstance(self.move_request.from_entity, Client):
+		if isinstance(self.move_request.product_batch.holder, Client):
 			return RelocateStage(
 				check_relocate_behavior=CheckListRelocateBehavior(
 					check_list_relocate_behavior=(
-						CheckProductBatchHolderIsFromEntity(),
+						CheckTargetIsHolder(),
 						CheckEnoughProductToRelocate(),
 					)
 				),
 				relocate_behavior=ChangeProductBatchGiveAway(),
 			)
-		elif isinstance(self.move_request.from_entity, StockRoomBasket):
+		elif isinstance(self.move_request.product_batch.holder, StockRoomBasket):
 			return RelocateStage(
 				check_relocate_behavior=CheckListRelocateBehavior(
 					check_list_relocate_behavior=(
-						CheckProductBatchHolderIsFromEntity(),
+						CheckTargetIsHolder(),
 						CheckEnoughProductToRelocate(),
 					)
 				),
@@ -48,12 +47,12 @@ class BaseRelocateManagerBuilder(RelocateManagerBuilder):
 			raise NotImplementedError()
 
 	def _get_take_stage(self) -> RelocateStage:
-		if isinstance(self.move_request.to_entity, Client):
+		if isinstance(self.move_request.target, Client):
 			return RelocateStage(
 				check_relocate_behavior=CheckRelocateBehavior(),
 				relocate_behavior=ProductBatchTakes()
 			)
-		elif isinstance(self.move_request.to_entity, StockRoomBasket):
+		elif isinstance(self.move_request.target, StockRoomBasket):
 			return RelocateStage(
 				check_relocate_behavior=CheckListRelocateBehavior(
 					check_list_relocate_behavior=(

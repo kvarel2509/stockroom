@@ -103,7 +103,7 @@ class StockRoomBasket(models.Model):
 	)
 
 	def __str__(self):
-		return f'StockRoomBasket<pk={self.pk}, stock_room={self.stock_room}, product={self.product}>'
+		return f'StockRoomBasket<pk={self.pk}, product={self.product.pk}, limit={self.limit}, tariff={self.tariff}>'
 
 	class Meta:
 		verbose_name = 'позиция на складе'
@@ -140,9 +140,7 @@ class ProductBatch(models.Model):
 	)
 
 	def __str__(self):
-		return f'ProductBatch<pk={self.pk}, product={self.product}, ' \
-			f'own={self.content_type_own}-{self.object_id_own}, ' \
-			f'holder={self.content_type_holder}-{self.object_id_holder}, amount={self.amount}>'
+		return f'ProductBatch<pk={self.pk}, product={self.product.pk}, amount={self.amount}>'
 
 
 class Road(models.Model):
@@ -163,4 +161,4 @@ class Road(models.Model):
 	)
 
 	def __str__(self):
-		return f'Road<pk={self.pk}, client={self.client}, stock_room={self.stock_room}, distance={self.distance}>'
+		return f'Road<pk={self.pk}, client={self.client.pk}, stock_room={self.stock_room.pk}, distance={self.distance}>'
