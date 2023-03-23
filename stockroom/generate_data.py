@@ -24,13 +24,14 @@ def generate_data(product_count, stockroom_count, client_count):
 		client=client,
 		stockroom=stockroom,
 		distance=random.randint(100, 1000)
-	) for client, stockroom in itertools.product([clients, stockrooms])])
+	) for client, stockroom in itertools.product(clients, stockrooms)])
 
 	for client in clients:
 		product_batch_count = random.randint(0, product_count)
 		products_for_client = random.sample(products, product_batch_count)
-		client.holder_product_batches.set([models.ProductBatch(
+		product_batches = models.ProductBatch.objects.bulk_create([models.ProductBatch(
 			product=product,
 			amount=random.randint(10, 50),
-			own=client
+			own=client,
+			holder=client
 		) for product in products_for_client])

@@ -19,5 +19,8 @@ from stockroom import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.ClientListView.as_view())
+    path('', views.ClientListView.as_view(), name='client_list'),
+    path('client/<int:pk>/', views.ClientHolderProductBatchListView.as_view(), name='client_detail'),
+    path('search_ways_relocation', views.SearchRequestWaysRelocationFormView.as_view(), name='search_ways_relocation'),
+    path('generate/', views.GenerateDataFormView.as_view(), name='generate_data')
 ]

@@ -1,8 +1,10 @@
+from django.urls import reverse_lazy
 from django.views import generic
 
-from stockroom.forms import GenerateDataForm
+from stockroom.forms import GenerateDataForm, SearchRequestWaysRelocationForm
+from stockroom.generate_data import generate_data
 from stockroom.logic.search_engine_for_ways_to_relocate.entities import SearchRequestData
-from stockroom.use_cases import get_client_list, get_client_holder_product_batches, \
+from stockroom.use_cases import get_client, get_client_list, get_client_holder_product_batches, \
 	get_available_stockroom_baskets_for_relocate_product_batch, find_way_for_relocate
 
 
@@ -17,19 +19,29 @@ class ClientListView(generic.TemplateView):
 
 
 class ClientHolderProductBatchListView(generic.TemplateView):
+	template_name = 'stockroom/client_detail.html'
+
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		client_pk = self.get_client_pk()
-		client_holder_product_batches = get_client_holder_product_batches(client_pk)
-		ctx['client'] = client_holder_product_batches.data.get('client')
-		ctx['client_holder_product_batches'] = client_holder_product_batches.data.get('product_batches')
+		ctx['client'] = get_client(client_pk).data.get('client')
+		ctx['client_holder_product_batches'] = get_client_holder_product_batches(client_pk).data.get('product_batches')
 		return ctx
 
 	def get_client_pk(self):
 		return self.kwargs.get('pk')
 
 
-class RelocationListView(generic.TemplateView):
+class RelocationListView(generic.FormView):
+	form_class = SearchRequestWaysRelocationForm
+	template_name = 'stockroom/ways_relocation.html'
+	
+
+	def form_valid(self, form):
+
+		return super().form_valid(form)
+	
+
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		product_batch_pk = self.get_product_batch_pk()
@@ -60,6 +72,12 @@ class RelocationListView(generic.TemplateView):
 
 class GenerateDataFormView(generic.FormView):
 	form_class = GenerateDataForm
+	template_name = 'stockroom/generate_data.html'
 
 	def form_valid(self, form):
-		pass
+		cleaned_data = form.cleaned_data
+		generate_data(**cleaned_data)
+		return super().form_valid(form)
+	
+	def get_success_url(self):
+		return reverse_lazy('client_list')

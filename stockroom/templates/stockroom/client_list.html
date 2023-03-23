@@ -5,6 +5,13 @@
 	<title>Title</title>
 </head>
 <body>
-	{{ client_list }}
+	<div class="client_list">
+		{% for client in client_list %}
+			<div class="client">
+				<a href="{% url 'client_detail' pk=client.pk %}">{{ client.name }}</a>
+			</div>
+		{% endfor %}
+	</div>
+	
 </body>
 </html>
