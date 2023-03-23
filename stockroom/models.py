@@ -62,17 +62,17 @@ class Client(models.Model):
 
 
 class StockRoomBasket(models.Model):
-	stock_room = models.ForeignKey(
+	stockroom = models.ForeignKey(
 		verbose_name='склад',
 		to=StockRoom,
 		on_delete=models.CASCADE,
-		related_name='stock_room_baskets'
+		related_name='stockroom_baskets'
 	)
 	product = models.ForeignKey(
 		verbose_name='продукция',
 		to=Product,
 		on_delete=models.CASCADE,
-		related_name='stock_room_baskets'
+		related_name='stockroom_baskets'
 	)
 	limit = models.PositiveIntegerField(
 		verbose_name='лимит',
@@ -98,12 +98,13 @@ class StockRoomBasket(models.Model):
 		verbose_name='партии продукции',
 		to='ProductBatch',
 		content_type_field='content_type_holder',
-		object_id_field='object_id_own',
+		object_id_field='object_id_holder',
 		related_query_name='holder_object'
 	)
 
 	def __str__(self):
-		return f'StockRoomBasket<pk={self.pk}, product={self.product.pk}, limit={self.limit}, tariff={self.tariff}>'
+		return f'StockRoomBasket<pk={self.pk}, product={self.product.pk}, limit={self.limit}, tariff={self.tariff}>, ' \
+			f'employed_limit={self.employed_limit}>'
 
 	class Meta:
 		verbose_name = 'позиция на складе'
@@ -150,7 +151,7 @@ class Road(models.Model):
 		on_delete=models.CASCADE,
 		related_name='roads'
 	)
-	stock_room = models.ForeignKey(
+	stockroom = models.ForeignKey(
 		verbose_name='склад',
 		to=StockRoom,
 		on_delete=models.CASCADE,
@@ -161,4 +162,4 @@ class Road(models.Model):
 	)
 
 	def __str__(self):
-		return f'Road<pk={self.pk}, client={self.client.pk}, stock_room={self.stock_room.pk}, distance={self.distance}>'
+		return f'Road<pk={self.pk}, client={self.client.pk}, stockroom={self.stockroom.pk}, distance={self.distance}>'

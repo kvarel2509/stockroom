@@ -1,14 +1,32 @@
-from stockroom.logic.product_relocation.check_relocate import CheckEnoughProductToRelocate, \
-	CheckStockRoomBasketSupportsProduct, CheckFitInStockRoomBasketLimit, CheckFitInStockRoomLimit, CheckTargetIsHolder
-from stockroom.logic.product_relocation.domain import RelocateManagerFactory, RelocateManager, \
-	RelocateStage, CheckListRelocateBehavior, RelocateListActionBehavior, CheckRelocateBehavior
-from stockroom.logic.product_relocation.product_relocation import ChangeProductBatchGiveAway, \
-	ChangeStockRoomBasketLimitGiveAway, ChangeStockRoomLimitGiveAway, ProductBatchTakes, \
-	ChangeStockRoomBasketLimitTakes, ChangeStockRoomLimitTakes
+from stockroom.logic.product_relocation.check_relocate import (
+	CheckEnoughProductToRelocate,
+	CheckStockRoomBasketSupportsProduct,
+	CheckFitInStockRoomBasketLimit,
+	CheckFitInStockRoomLimit,
+	CheckTargetIsHolder
+)
+from stockroom.logic.product_relocation.domain import (
+	RelocateManagerFactory,
+	RelocateManager,
+	RelocateStage,
+	CheckListRelocateBehavior,
+	RelocateListActionBehavior,
+	CheckRelocateBehavior
+)
+from stockroom.logic.product_relocation.product_relocation import (
+	ChangeProductBatchGiveAway,
+	ChangeStockRoomBasketLimitGiveAway,
+	ChangeStockRoomLimitGiveAway,
+	ProductBatchTakes,
+	ChangeStockRoomBasketLimitTakes,
+	ChangeStockRoomLimitTakes
+)
 from stockroom.models import Client, StockRoomBasket
 
 
 class BaseRelocateManagerFactory(RelocateManagerFactory):
+	"""Реализация фабрики, предоставляющая контекст для управления размещением продукции"""
+
 	def get_relocate_manager(self) -> RelocateManager:
 		return RelocateManager(
 			move_request=self.move_request,
@@ -37,9 +55,9 @@ class BaseRelocateManagerFactory(RelocateManagerFactory):
 				),
 				relocate_behavior=RelocateListActionBehavior(
 					relocate_list_action_behavior=(
-						ChangeProductBatchGiveAway(),
 						ChangeStockRoomBasketLimitGiveAway(),
 						ChangeStockRoomLimitGiveAway(),
+						ChangeProductBatchGiveAway(),
 					)
 				)
 			)

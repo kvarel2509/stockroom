@@ -52,8 +52,8 @@ class Migration(migrations.Migration):
                 ('limit', models.PositiveIntegerField(verbose_name='лимит')),
                 ('employed_limit', models.IntegerField(default=0, verbose_name='используемый лимит')),
                 ('tariff', models.DecimalField(decimal_places=1, help_text='за единицу продукта', max_digits=10, verbose_name='тариф')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stock_room_baskets', to='stockroom.product', verbose_name='продукция')),
-                ('stock_room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stock_room_baskets', to='stockroom.stockroom', verbose_name='склад')),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stockroom_baskets', to='stockroom.product', verbose_name='продукция')),
+                ('stockroom', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stockroom_baskets', to='stockroom.stockroom', verbose_name='склад')),
             ],
             options={
                 'verbose_name': 'позиция на складе',
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('distance', models.PositiveIntegerField(verbose_name='дистанция')),
                 ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='roads', to='stockroom.client', verbose_name='клиент')),
-                ('stock_room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='roads', to='stockroom.stockroom', verbose_name='склад')),
+                ('stockroom', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='roads', to='stockroom.stockroom', verbose_name='склад')),
             ],
         ),
         migrations.CreateModel(
