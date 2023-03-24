@@ -34,7 +34,7 @@ class SearchResponse:
 class SearchMethod:
 	"""Базовый класс - Алгоритм поиска пути размещения"""
 
-	def search(self, search_request: SearchRequest) -> Generator: ...
+	def search(self, search_request: SearchRequest) -> SearchResponse: ...
 
 
 class SearchEngine:
@@ -44,7 +44,7 @@ class SearchEngine:
 		self.search_request = search_request
 		self.search_method = search_method
 
-	def search(self) -> Generator:
+	def search(self) -> SearchResponse:
 		return self.search_method.search(self.search_request)
 
 

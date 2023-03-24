@@ -35,39 +35,29 @@ class ClientHolderProductBatchListView(generic.TemplateView):
 class RelocationListView(generic.FormView):
 	form_class = SearchRequestWaysRelocationForm
 	template_name = 'stockroom/ways_relocation.html'
-	
 
 	def form_valid(self, form):
+		cd = form.cleaned_data
+		return self.render_to_response(self.get_extra_context_data(cd))
 
-		return super().form_valid(form)
-	
-
-	def get_context_data(self, **kwargs):
+	def get_extra_context_data(self, cd, **kwargs):
 		ctx = super().get_context_data(**kwargs)
-		product_batch_pk = self.get_product_batch_pk()
-		stockroom_baskets = get_available_stockroom_baskets_for_relocate_product_batch(product_batch_pk)
-		ctx['stockroom_baskets'] = stockroom_baskets.data.get('stockroom_baskets')
+		product_batch_pk = cd.get('product_batch_pk')
+		amount = cd.get('amount')
+
 		short_way_search_request_data = SearchRequestData(
 			product_batch_pk=product_batch_pk,
 			method_alias='short_way',
-			amount=self.get_amount(),
-			options_count=1
+			amount=amount,
 		)
 		cheap_way_search_request_data = SearchRequestData(
 			product_batch_pk=product_batch_pk,
-			method_alias='short_way',
-			amount=self.get_amount(),
-			options_count=1
+			method_alias='cheap_way',
+			amount=amount,
 		)
-		ctx['short_way'] = find_way_for_relocate(short_way_search_request_data).data.get('ways')
-		ctx['cheap_way'] = find_way_for_relocate(cheap_way_search_request_data).data.get('ways')
+		ctx['short_way'] = find_way_for_relocate(short_way_search_request_data).data.get('search_response')
+		ctx['cheap_way'] = find_way_for_relocate(cheap_way_search_request_data).data.get('search_response')
 		return ctx
-
-	def get_product_batch_pk(self):
-		return self.kwargs.get('pk')
-
-	def get_amount(self):
-		return self.request.GET.get('amount')
 
 
 class GenerateDataFormView(generic.FormView):

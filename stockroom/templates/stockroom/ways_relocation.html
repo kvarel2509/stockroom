@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<style>
+		.short_way, .cheap_way
+		{
+			display: grid;
+			grid-template-columns: max-content 100%;
+			grid-gap: 10px;
+		}
+		.desc
+		{
+			display: flex;
+		}
+		.desc-item
+		{
+			display: flex;
+			flex-direction: column;
+		}
+	</style>
+</head>
+<body>
+	<form method="post" action="{% url 'relocation_list' %}">
+		{% csrf_token %}
+		{{ form.as_div }}
+		<button type="submit">OK</button>
+	</form>
+	<br>
+	<div>Самый короткий путь</div>
+	<div class="short_way">
+		<div>{{ short_way.coat }}</div>
+		<div class="desc">
+			{% for move_request in short_way.move_requests %}
+				<div class="desc-item">
+					<div>target_pk  {{ move_request.target.pk }}</div>
+					<div>target_name   {{ move_request.target.stockroom.name }}</div>
+					<div>amount   {{ move_request.amount }}</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	<div>Самый дешевый путь</div>
+	<div class="cheap_way">
+		<div>{{ cheap_way.coat }}</div>
+		<div class="desc">
+			{% for move_request in cheap_way.move_requests %}
+				<div class="desc-item">
+					<div>target_pk  {{ move_request.target.pk }}</div>
+					<div>target_name   {{ move_request.target.stockroom.name }}</div>
+					<div>amount   {{ move_request.amount }}</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</body>
+</html>

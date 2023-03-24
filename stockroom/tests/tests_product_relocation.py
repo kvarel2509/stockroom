@@ -9,14 +9,11 @@ from stockroom.logic.product_relocation.exceptions import (
 from stockroom.logic.product_relocation.factory import BaseRelocateManagerFactory
 from stockroom.logic.search_engine_for_ways_to_relocate.domain import SearchRequest
 from stockroom.logic.search_engine_for_ways_to_relocate.factory import BaseSearchEngineFactory
-from stockroom.logic.search_engine_for_ways_to_relocate.entities import SearchRequestData
 from stockroom.models import Road
 
 import decimal
 
 from django.test import TestCase
-
-from stockroom.use_cases import find_way_for_relocate
 
 
 class ProductRelocateTests(TestCase):
@@ -193,28 +190,18 @@ class ProductRelocateTests(TestCase):
 	def test_search_ways_for_relocate_short_way(self):
 		search_request1 = SearchRequest(
 			product_batch=self.product_batch1,
-			amount=7,
+			amount=20,
 			method_alias='short_way'
 		)
 		factory1 = BaseSearchEngineFactory(search_request1)
 		search_engine1 = factory1.get_search_engine()
-		gen = search_engine1.search()
-
-		search_response = next(gen)
+		search_response = search_engine1.search()
 		self.assertEqual(search_response.coat, decimal.Decimal('28'))
 		self.assertEqual(len(search_response), 1)
 
 		move_request = search_response.move_requests.pop()
 		self.assertEqual(move_request.target, self.stockroom3_basket5)
 		self.assertEqual(move_request.amount, 7)
-		search_response = next(gen)
-		self.assertEqual(search_response.coat, decimal.Decimal('16'))
-		self.assertEqual(len(search_response), 2)
-		move_request1, move_request2 = sorted(list(search_response.move_requests), key=lambda x: x.amount)
-		self.assertEqual(move_request1.amount, 2)
-		self.assertEqual(move_request2.amount, 5)
-		self.assertEqual(move_request1.target, self.stockroom2_basket3)
-		self.assertEqual(move_request2.target, self.stockroom1_basket1)
 
 		search_request2 = SearchRequest(
 			product_batch=self.product_batch1,
@@ -223,10 +210,8 @@ class ProductRelocateTests(TestCase):
 		)
 		factory2 = BaseSearchEngineFactory(search_request2)
 		search_engine2 = factory2.get_search_engine()
-		gen = search_engine2.search()
-
-		with self.assertRaises(StopIteration):
-			next(gen)
+		search_response = search_engine2.search()
+		self.assertEqual(search_response, None)
 
 	def test_search_ways_for_relocate_cheap_way(self):
 		search_request3 = SearchRequest(
@@ -236,8 +221,7 @@ class ProductRelocateTests(TestCase):
 		)
 		factory3 = BaseSearchEngineFactory(search_request3)
 		search_engine3 = factory3.get_search_engine()
-		gen = search_engine3.search()
-		search_response = next(gen)
+		search_response = search_engine3.search()
 		self.assertEqual(search_response.coat, decimal.Decimal('16'))
 		self.assertEqual(len(search_response), 2)
 		move_request1, move_request2 = sorted(list(search_response.move_requests), key=lambda x: x.amount)

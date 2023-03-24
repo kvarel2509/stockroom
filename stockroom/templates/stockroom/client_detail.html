@@ -3,18 +3,30 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Title</title>
+	<style>
+		.product_batch_list
+		{
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			width: 50%;
+			gap: 15px;
+		}
+	</style>
 </head>
 <body>
-    <div class="client">
-        {{ client.name }}
-    </div>
+	<div class="client">
+		{{ client.name }}
+	</div>
 	<div class="product_batch_list">
+		<div>pk</div>
+		<div>product name</div>
+		<div>amount</div>
 		{% for product_batch in client_holder_product_batches %}
-			<div class="product_batch">
-				<div>{{ product_batch }}</div>
-			</div>
+			<div>{{ product_batch.pk }}</div>
+			<div>{{ product_batch.product.name }}</div>
+			<div>{{ product_batch.amount }}</div>
 		{% endfor %}
 	</div>
-	
+	<a href="{% url 'relocation_list' %}">Выполнить перемещение</a>
 </body>
 </html>

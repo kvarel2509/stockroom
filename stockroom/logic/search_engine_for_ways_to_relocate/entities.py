@@ -9,7 +9,6 @@ class SearchRequestData:
 	product_batch_pk: int
 	amount: int
 	method_alias: str
-	options_count: int
 
 	def get_object(self):
 		product_batch = models.ProductBatch.objects.get(pk=self.product_batch_pk)

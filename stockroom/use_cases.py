@@ -42,17 +42,8 @@ def find_way_for_relocate(search_request_data: SearchRequestData):
 	search_request = search_request_data.get_object()
 	factory = BaseSearchEngineFactory(search_request)
 	search_engine = factory.get_search_engine()
-	gen = search_engine.search()
-	data = []
-
-	for i in range(search_request_data.options_count):
-		try:
-			search_response = next(gen)
-			data.append(search_response)
-		except StopIteration:
-			break
-
-	return Response(data={'ways': data}, status='ok')
+	search_response = search_engine.search()
+	return Response(data={'search_response': search_response}, status='ok')
 
 
 def get_client_list():
